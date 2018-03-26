@@ -14,36 +14,39 @@
 
 
 void DAL::populate(std::string username) {
-//    std::ifstream infile(username+".txt");
-//    std::getline(infile, this->username);
-//    std::getline(infile, this->password);
-//    std::getline(infile, this->name);
-//    std::getline(infile, this->phone);
-//    std::getline(infile, this->email);
-//
-//    std::string entry;
-//    while(std::getline(infile, entry)){
-//
-//        std::stringstream stream(entry);
-//        std::vector<std::string> fields;
-//        std::string token;
-//
-//        while(std::getline(stream, token, ';')){
-//            fields.push_back(token);
-//        }
-//
-//        userAppointment newAppointment;
-//
-//        newAppointment.username = fields[USERNAME_POS];
-//        newAppointment.date = fields[DATE_POS];
-//        newAppointment.time = fields[TIME_POS];
-//        newAppointment.reason = fields[REASON_POS];
-//
-//        appointmentTable[fields[DATE_POS]+fields[TIME_POS]] = newAppointment;
-//
-//    }
-//
-//    infile.close();
+
+	std::string filename = username+".txt";
+
+    std::ifstream infile(filename.c_str());
+    std::getline(infile, this->username);
+    std::getline(infile, this->password);
+    std::getline(infile, this->name);
+    std::getline(infile, this->phone);
+    std::getline(infile, this->email);
+
+    std::string entry;
+    while(std::getline(infile, entry)){
+
+        std::stringstream stream(entry);
+        std::vector<std::string> fields;
+        std::string token;
+
+        while(std::getline(stream, token, ';')){
+            fields.push_back(token);
+        }
+
+        userAppointment newAppointment;
+
+        newAppointment.username = fields[USERNAME_POS];
+        newAppointment.date = fields[DATE_POS];
+        newAppointment.time = fields[TIME_POS];
+        newAppointment.reason = fields[REASON_POS];
+
+        appointmentTable[fields[DATE_POS]+fields[TIME_POS]] = newAppointment;
+
+    }
+
+    infile.close();
 
 }
 
