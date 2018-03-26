@@ -9,40 +9,41 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
+#include <cstdlib>
 #include "DAL.h"
 
 
 void DAL::populate(std::string username) {
-    std::ifstream infile(username+".txt");
-    std::getline(infile, this->username);
-    std::getline(infile, this->password);
-    std::getline(infile, this->name);
-    std::getline(infile, this->phone);
-    std::getline(infile, this->email);
-
-    std::string entry;
-    while(std::getline(infile, entry)){
-
-        std::stringstream stream(entry);
-        std::vector<std::string> fields;
-        std::string token;
-
-        while(std::getline(stream, token, ';')){
-            fields.push_back(token);
-        }
-
-        userAppointment newAppointment;
-
-        newAppointment.username = fields[USERNAME_POS];
-        newAppointment.date = fields[DATE_POS];
-        newAppointment.time = fields[TIME_POS];
-        newAppointment.reason = fields[REASON_POS];
-
-        appointmentTable[fields[DATE_POS]+fields[TIME_POS]] = newAppointment;
-
-    }
-
-    infile.close();
+//    std::ifstream infile(username+".txt");
+//    std::getline(infile, this->username);
+//    std::getline(infile, this->password);
+//    std::getline(infile, this->name);
+//    std::getline(infile, this->phone);
+//    std::getline(infile, this->email);
+//
+//    std::string entry;
+//    while(std::getline(infile, entry)){
+//
+//        std::stringstream stream(entry);
+//        std::vector<std::string> fields;
+//        std::string token;
+//
+//        while(std::getline(stream, token, ';')){
+//            fields.push_back(token);
+//        }
+//
+//        userAppointment newAppointment;
+//
+//        newAppointment.username = fields[USERNAME_POS];
+//        newAppointment.date = fields[DATE_POS];
+//        newAppointment.time = fields[TIME_POS];
+//        newAppointment.reason = fields[REASON_POS];
+//
+//        appointmentTable[fields[DATE_POS]+fields[TIME_POS]] = newAppointment;
+//
+//    }
+//
+//    infile.close();
 
 }
 
@@ -51,20 +52,20 @@ void DAL::print() {
 
     std::cout << this->username << "\n" << this->password <<  "\n" << this->name << "\n" << this->phone << "\n"
     << this->email << "\n";
-    for(std::pair<std::string , userAppointment>  i: appointmentTable){
-        std::cout << i.second.date << " " << i.second.time << " " << i.second.reason << "\n";
-    }
+//    for(std::pair<std::string , userAppointment>  i: appointmentTable){
+//        std::cout << i.second.date << " " << i.second.time << " " << i.second.reason << "\n";
+//    }
 }
 
 void DAL::write() {
 
-    std::ofstream ofstream(this->username + ".txt");
-    ofstream << this->username << "\n" << this->password <<  "\n" << this->name << "\n" << this->phone << "\n"
-    << this->email << "\n";
-    for(std::pair<std::string , userAppointment>  i: appointmentTable){
-        ofstream << this->username << ";" << i.second.reason << ";" << i.second.date << ";" << i.second.time << "\n";
-    }
-    ofstream.close();
+//    std::ofstream ofstream(this->username + ".txt");
+//    ofstream << this->username << "\n" << this->password <<  "\n" << this->name << "\n" << this->phone << "\n"
+//    << this->email << "\n";
+//    for(std::pair<std::string , userAppointment>  i: appointmentTable){
+//        ofstream << this->username << ";" << i.second.reason << ";" << i.second.date << ";" << i.second.time << "\n";
+//    }
+//    ofstream.close();
 }
 
 
@@ -74,8 +75,9 @@ std::string DAL::readPassword(std::string) {
 
 
 bool DAL::exists(std::string username) {
-    std::ifstream infile(username+".txt");
-    return infile.is_open();
+//    std::ifstream infile(username+".txt");
+//    return infile.is_open();
+    return true;
 }
 
 
@@ -105,11 +107,11 @@ void DAL::removeAppointment(std::string username, std::string date, std::string 
 
 std::string DAL::sendAllAppointments(std::string username) {
     std::string appointments;
-    for(std::pair<std::string, userAppointment> appointment : appointmentTable ){
-
-        appointments += (appointment.second.reason + " on " + appointment.second.date
-                         + " at " + appointment.second.time + "\n");
-    }
+//    for(std::pair<std::string, userAppointment> appointment : appointmentTable ){
+//
+//        appointments += (appointment.second.reason + " on " + appointment.second.date
+//                         + " at " + appointment.second.time + "\n");
+//    }
 
     return appointments;}
 
@@ -142,26 +144,26 @@ std::string DAL::rangeReturnAppointments(std::string start, std::string end) {
     std::getline(endStream, endDay, '/');
     std::getline(endStream, endYear);
 
-    int startDate = std::stoi(startDay) + std::stoi(startMonth) * 100 + std::stoi(startYear) *10000;
-    int endDate = std::stoi(endDay) + std::stoi(endMonth) * 100 + std::stoi(endYear) *10000;
+//    int startDate = std::stoi(startDay) + std::stoi(startMonth) * 100 + std::stoi(startYear) *10000;
+//    int endDate = std::stoi(endDay) + std::stoi(endMonth) * 100 + std::stoi(endYear) *10000;
 
-    for(std::pair<std::string, userAppointment> appointment : this->appointmentTable ){
-        std::stringstream date(appointment.second.date);
-        std::string day;
-        std::string month;
-        std::string year;
-
-        std::getline(date, month, '/');
-        std::getline(date, day, '/');
-        std::getline(date, year);
-
-        int dateValue = std::stoi(day) + std::stoi(month) * 100 + std::stoi(year) *10000;
-
-        if(dateValue >= startDate && dateValue <= endDate){
-            appointments += (appointment.second.reason + " on " + appointment.second.date
-                             + " at " + appointment.second.time + "\n");
-        }
-
-    }
+//    for(std::pair<std::string, userAppointment> appointment : this->appointmentTable ){
+//        std::stringstream date(appointment.second.date);
+//        std::string day;
+//        std::string month;
+//        std::string year;
+//
+//        std::getline(date, month, '/');
+//        std::getline(date, day, '/');
+//        std::getline(date, year);
+//
+//        int dateValue = std::stoi(day) + std::stoi(month) * 100 + std::stoi(year) *10000;
+//
+//        if(dateValue >= startDate && dateValue <= endDate){
+//            appointments += (appointment.second.reason + " on " + appointment.second.date
+//                             + " at " + appointment.second.time + "\n");
+//        }
+//
+//    }
     std::cout << appointments;
 return appointments;}
