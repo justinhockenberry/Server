@@ -61,14 +61,14 @@ void DAL::print() {
 }
 
 void DAL::write() {
-
-//    std::ofstream ofstream(this->username + ".txt");
-//    ofstream << this->username << "\n" << this->password <<  "\n" << this->name << "\n" << this->phone << "\n"
-//    << this->email << "\n";
+	std::string filename = this->username + ".txt";
+    std::ofstream ofstream(filename.c_str());
+    ofstream << this->username << "\n" << this->password <<  "\n" << this->name << "\n" << this->phone << "\n"
+    << this->email << "\n";
 //    for(std::pair<std::string , userAppointment>  i: appointmentTable){
 //        ofstream << this->username << ";" << i.second.reason << ";" << i.second.date << ";" << i.second.time << "\n";
 //    }
-//    ofstream.close();
+    ofstream.close();
 }
 
 
@@ -78,9 +78,9 @@ std::string DAL::readPassword(std::string) {
 
 
 bool DAL::exists(std::string username) {
-//    std::ifstream infile(username+".txt");
-//    return infile.is_open();
-    return true;
+	std::string filename = username + ".txt";
+    std::ifstream infile(filename.c_str());
+    return infile.is_open();
 }
 
 
