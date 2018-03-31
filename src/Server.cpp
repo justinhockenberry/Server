@@ -32,454 +32,455 @@
 
 void sigchld_handler(int s){
 
-    while(wait(NULL) > 0);
+	while(wait(NULL) > 0);
 
 }
 
 int main(void) {
 
-    int sockfd, new_fd;
-    struct sockaddr_in my_addr;
-    struct sockaddr_in their_addr;
-    int sin_size;
-    struct sigaction sa;
-    int yes = 1;
-    char *recvbuf;
-    char *caddr;
-    char* recieved;
-    long numbytes;
-//    DAL user = DAL();
-    User user= User();
+	int sockfd, new_fd;
+	struct sockaddr_in my_addr;
+	struct sockaddr_in their_addr;
+	int sin_size;
+	struct sigaction sa;
+	int yes = 1;
+	char *recvbuf;
+	char *caddr;
+	char* recieved;
+	long numbytes;
+	//    DAL user = DAL();
+	User user= User();
 
 
-    /*
-     *
-     * Connection Sequence =============================================================================================
-     *
-     */
-    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        perror("socket");
-        exit(1);
-    }
+	/*
+	 *
+	 * Connection Sequence =============================================================================================
+	 *
+	 */
+	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		perror("socket");
+		exit(1);
+	}
 
-    printf("SOCK_FD=%d\n", sockfd);
-    if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1){
-        perror("setsockopt");
-        exit(1);
-    }
+	printf("SOCK_FD=%d\n", sockfd);
+	if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1){
+		perror("setsockopt");
+		exit(1);
+	}
 
-    my_addr.sin_family = AF_INET;
-    my_addr.sin_port = htons(MYPORT);
-    my_addr.sin_addr.s_addr = INADDR_ANY;
-    memset(&(my_addr.sin_zero), '\0', 8);
+	my_addr.sin_family = AF_INET;
+	my_addr.sin_port = htons(MYPORT);
+	my_addr.sin_addr.s_addr = INADDR_ANY;
+	memset(&(my_addr.sin_zero), '\0', 8);
 
-    if(bind(sockfd, (struct sockaddr *) &my_addr, sizeof(struct sockaddr)) == -1){
-        perror("bind");
-        exit(1);
-    }
+	if(bind(sockfd, (struct sockaddr *) &my_addr, sizeof(struct sockaddr)) == -1){
+		perror("bind");
+		exit(1);
+	}
 
-    if(listen(sockfd, BACKLOG) == -1){
-        perror("listen");
-        exit(1);
-    }
+	if(listen(sockfd, BACKLOG) == -1){
+		perror("listen");
+		exit(1);
+	}
 
-    sa.sa_handler = sigchld_handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    if(sigaction(SIGCHLD, &sa, NULL) == -1){
-        perror("sigaction");
-        exit(1);
-    }
+	sa.sa_handler = sigchld_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	if(sigaction(SIGCHLD, &sa, NULL) == -1){
+		perror("sigaction");
+		exit(1);
+	}
 
-    //Main server function loop
-    while(1){
-        sin_size = sizeof(struct sockaddr_in);
-        //added (socklen_t*) due to type mismatch
-        if((new_fd = accept(sockfd, (struct sockaddr *)&their_addr, (socklen_t*) &sin_size)) == -1){
-            perror("accept");
-            exit(1);
-        }
-        printf("[Server] got connection from %s\n",  inet_ntoa(their_addr.sin_addr));
-        //Creating threads for each client connection
-        if(!fork()){
-            close(sockfd);
-            recvbuf=(char *) calloc(128, sizeof(char));
+	//Main server function loop
+	while(1){
+		sin_size = sizeof(struct sockaddr_in);
+		//added (socklen_t*) due to type mismatch
+		if((new_fd = accept(sockfd, (struct sockaddr *)&their_addr, (socklen_t*) &sin_size)) == -1){
+			perror("accept");
+			exit(1);
+		}
+		printf("[Server] got connection from %s\n",  inet_ntoa(their_addr.sin_addr));
+		//Creating threads for each client connection
+		if(!fork()){
+			close(sockfd);
+			recvbuf=(char *) calloc(128, sizeof(char));
 
-            std::string send_buf;
-            std::string username;
-            std::string password;
+			std::string send_buf;
+			std::string username;
+			std::string password;
 
-            /**
-             *
-             * Login Sequence===========================================================================================
-             *
-             */
-            bool loggedIn = false;
-            bool validated = false;
-            while(!loggedIn){
-                //send Login menu
-                send(new_fd, login.c_str(), 127, 0);
+			/**
+			 *
+			 * Login Sequence===========================================================================================
+			 *
+			 */
+			bool loggedIn = false;
+			bool validated = false;
+			while(!loggedIn){
+				//send Login menu
+				send(new_fd, login.c_str(), 127, 0);
 
-                //Receive Selection
-                numbytes = recv(new_fd, recvbuf, 127, 0);
-                recvbuf[numbytes] = '\0';
-                std::string loginChoice = recvbuf;
-                std::cout << "[Client] " << loginChoice << "\n";
-                /*
-                 * If user decides to login
-                 */
-                if(!loginChoice.compare("1")){
-                    while(!validated) {
+				//Receive Selection
+				numbytes = recv(new_fd, recvbuf, 127, 0);
+				recvbuf[numbytes] = '\0';
+				std::string loginChoice = recvbuf;
+				std::cout << "[Client] " << loginChoice << "\n";
+				/*
+				 * If user decides to login
+				 */
+				if(!loginChoice.compare("1")){
+					while(!validated) {
 
-                        //recieve username
-                        numbytes = recv(new_fd, recvbuf, 127, 0);
-                        recvbuf[numbytes] = '\0';
-                        std::cout << "[Client]: " << recvbuf << "\n";
-                        username = recvbuf;
+						//recieve username
+						numbytes = recv(new_fd, recvbuf, 127, 0);
+						recvbuf[numbytes] = '\0';
+						std::cout << "[Client]: " << recvbuf << "\n";
+						username = recvbuf;
 
-                        //receive password
-                        numbytes = recv(new_fd, recvbuf, 127, 0);
-                        recvbuf[numbytes] = '\0';
-                        std::cout << "[Client]: " << recvbuf << "\n";
-                        password = recvbuf;
-
-
-                        //Login Successful
-                        if(user.exists(username)){
-                            user.populate(username);
-                            if (!user.readPassword(username).compare(password)) {
-                                send_buf = "Success";
-                                send(new_fd, send_buf.c_str(), 127, 0);
-                                std::cout << "[Server]: " << send_buf << "\n";
-                                validated = true;
-                                loggedIn = true;
-                            }
-                            else{ // Login Failure
-                                send_buf = "Failure";
-                                send(new_fd, send_buf.c_str(), 127, 0);
-                                std::cout << "[Server]: " << send_buf << "\n";
-                            }
-                        }else{ // Login Failure
-                            send_buf = "Failure";
-                            send(new_fd, send_buf.c_str(), 127, 0);
-                            std::cout << "[Server]: " << send_buf << "\n";
-                        }
+						//receive password
+						numbytes = recv(new_fd, recvbuf, 127, 0);
+						recvbuf[numbytes] = '\0';
+						std::cout << "[Client]: " << recvbuf << "\n";
+						password = recvbuf;
 
 
-                    }
+						//Login Successful
+						if(user.exists(username)){
+							user.populate(username);
+							if (!user.readPassword(username).compare(password)) {
+								send_buf = "Success";
+								send(new_fd, send_buf.c_str(), 127, 0);
+								std::cout << "[Server]: " << send_buf << "\n";
+								validated = true;
+								loggedIn = true;
+							}
+							else{ // Login Failure
+								send_buf = "Failure";
+								send(new_fd, send_buf.c_str(), 127, 0);
+								std::cout << "[Server]: " << send_buf << "\n";
+							}
+						}else{ // Login Failure
+							send_buf = "Failure";
+							send(new_fd, send_buf.c_str(), 127, 0);
+							std::cout << "[Server]: " << send_buf << "\n";
+						}
 
-                /*
-                 * If user wants to create a new account
-                 */
-                }
-                else if(!loginChoice.compare("2")){
-                    //receive username and check if user already exists
-                    bool exists = true;
-                    while(exists){
-                        numbytes = recv(new_fd, recvbuf, 127, 0);
-                        recvbuf[numbytes] = '\0';
-                        std::cout << "[Client]: " << recvbuf << "\n";
-                        username = recvbuf;
 
-                        if(!user.exists(username)){
-                            send_buf = "Success";
-                            send(new_fd, send_buf.c_str(), 127, 0);
-                            std::cout << "[Server]: " << send_buf << "\n";
-                            exists = false;
-                        }
-                        else{
-                            send_buf = "Failure";
-                            send(new_fd, send_buf.c_str(), 127, 0);
-                            std::cout << "[Server]: " << send_buf << "\n";
-                        }
-                    }
+					}
 
-                    user.setUsername(username);
+					/*
+					 * If user wants to create a new account
+					 */
+				}
+				else if(!loginChoice.compare("2")){
+					//receive username and check if user already exists
+					bool exists = true;
+					while(exists){
+						numbytes = recv(new_fd, recvbuf, 127, 0);
+						recvbuf[numbytes] = '\0';
+						std::cout << "[Client]: " << recvbuf << "\n";
+						username = recvbuf;
 
-                    //receive password
-                    numbytes = recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::cout << "[Client]: " << recvbuf << "\n";
-                    password = recvbuf;
-                    user.setPassword(password);
+						if(!user.exists(username)){
+							send_buf = "Success";
+							send(new_fd, send_buf.c_str(), 127, 0);
+							std::cout << "[Server]: " << send_buf << "\n";
+							exists = false;
+						}
+						else{
+							send_buf = "Failure";
+							send(new_fd, send_buf.c_str(), 127, 0);
+							std::cout << "[Server]: " << send_buf << "\n";
+						}
+					}
 
-                    //receive name
-                    numbytes = recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::cout << "[Client]: " << recvbuf << "\n";
-                    std::string name = recvbuf;
-                    user.setName(name);
+					user.setUsername(username);
 
-                    //receive email
-                    numbytes = recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::cout << "[Client]: " << recvbuf << "\n";
-                    std::string email = recvbuf;
-                    user.setEmail(email);
+					//receive password
+					numbytes = recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::cout << "[Client]: " << recvbuf << "\n";
+					password = recvbuf;
+					user.setPassword(password);
 
-                    //receive phone number
-                    numbytes = recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::cout << "[Client]: " << recvbuf << "\n";
-                    std::string phone = recvbuf;
-                    user.setPhone(phone);
+					//receive name
+					numbytes = recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::cout << "[Client]: " << recvbuf << "\n";
+					std::string name = recvbuf;
+					user.setName(name);
 
-                    user.write();
+					//receive email
+					numbytes = recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::cout << "[Client]: " << recvbuf << "\n";
+					std::string email = recvbuf;
+					user.setEmail(email);
 
-                    loggedIn = true;
-                }
-                else{
-                    send_buf = "Invalid Choice";
-                    std::cout << "[Server]: " << send_buf << "\n";
-                }
-            }
-            /**
-             *
-             *
-             *
-             * Main menu operations begin here =========================================================================
-             *
-             *
-             *
-             */
-            while(true){
-                //print menu
-                send_buf = menu;
-                if(send(new_fd, send_buf.c_str(), 512, 0) == -1){
-                    perror("send");
-                    close(new_fd);
-                    exit(1);
-                }
-                std::cout <<"[Server]: "<< send_buf << "\n";
+					//receive phone number
+					numbytes = recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::cout << "[Client]: " << recvbuf << "\n";
+					std::string phone = recvbuf;
+					user.setPhone(phone);
 
-                //Recieve client response
-                numbytes=recv(new_fd, recvbuf, 127, 0);
-                recvbuf[numbytes] = '\0';
-                std::cout << "[Client]: " << recvbuf << "\n";
+					user.write();
 
-                std::string choice = recvbuf;
-                /**
-                 *
-                 *
-                 *
-                 * Main menu choices are here
-                 *
-                 *
-                 *
-                 */
-                if(!choice.compare("1")) {
-                    // A) Modify name
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    user.setName(recvbuf);
-                    user.write();
-                    send_buf = "Success";
-                    send(new_fd, send_buf.c_str(), 127, 0);
-                    std::cout << "Modified name: "<< recvbuf << std::endl;
+					loggedIn = true;
+				}
+				else{
+					send_buf = "Invalid Choice";
+					std::cout << "[Server]: " << send_buf << "\n";
+				}
+			}
+			/**
+			 *
+			 *
+			 *
+			 * Main menu operations begin here =========================================================================
+			 *
+			 *
+			 *
+			 */
+			while(true){
+				//print menu
+				send_buf = menu;
+				if(send(new_fd, send_buf.c_str(), 512, 0) == -1){
+					perror("send");
+					close(new_fd);
+					exit(1);
+				}
+				std::cout <<"[Server]: "<< send_buf << "\n";
 
-                }
-                else if(!choice.compare("2")){
-                    //B) Modify password
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    user.setPassword(recvbuf);
-                    user.write();
-                    send_buf = "Success";
-                    send(new_fd, send_buf.c_str(), 127, 0);
-                    std::cout << "Modified password: "<< recvbuf << std::endl;
-                }
-                else if(!choice.compare("3")){
-                    //C) Modify phone number
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    user.setPhone(recvbuf);
-                    user.write();
-                    send_buf = "Success";
-                    send(new_fd, send_buf.c_str(), 127, 0);
-                    std::cout << "Modified phone number: "<< recvbuf << std::endl;
-                }
-                else if(!choice.compare("4")){
-                    //D) Modify email
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    user.setEmail(recvbuf);
-                    user.write();
-                    send_buf = "Success";
-                    send(new_fd, send_buf.c_str(), 127, 0);
-                    std::cout << "Modified email: "<< recvbuf << std::endl;
-                }
-                else if(!choice.compare("5")){
-                    //E) Delete a user
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::string check = recvbuf;
-                    if(!check.compare("Y") || !check.compare("y")){
-                        user.remove();
-                        send_buf = "Success";
-                        send(new_fd, send_buf.c_str(), 127, 0);
-                        _Exit(0);
-                    }else{
-                        send_buf = "Cancelled";
-                        send(new_fd, send_buf.c_str(), 127, 0);
-                    }
-                }
-                else if(!choice.compare("6")){
-                    //F) Add a new appointment
-                    send_buf = user.sendAllAppointments(username);
-                    send(new_fd, send_buf.c_str(), 512, 0);
+				//Recieve client response
+				numbytes=recv(new_fd, recvbuf, 127, 0);
+				recvbuf[numbytes] = '\0';
+				std::cout << "[Client]: " << recvbuf << "\n";
 
-                    std::string appDate;
-                    std::string appTime;
-                    int conflict = 1;
-                    //Check for conflicting appointments
-                    while(conflict) {
-                        numbytes = recv(new_fd, recvbuf, 127, 0);
-                        recvbuf[numbytes] = '\0';
-                        appDate = recvbuf;
+				std::string choice = recvbuf;
+				/**
+				 *
+				 *
+				 *
+				 * Main menu choices are here
+				 *
+				 *
+				 *
+				 */
 
-                        numbytes = recv(new_fd, recvbuf, 127, 0);
-                        recvbuf[numbytes] = '\0';
-                        appTime = recvbuf;
+				if(!choice.compare("1")){
+					//F) Add a new appointment
+					send_buf = user.sendAllAppointments(username);
+					send(new_fd, send_buf.c_str(), 512, 0);
 
-                        conflict = user.conflictCheck(appDate, appTime, username);
-                        if (conflict) {
-                            send_buf = "Failure";
-                            std::cout << send_buf << std::endl;
-                            send(new_fd, send_buf.c_str(), 127, 0);
-                        } else {
-                            send_buf = "Success";
-                            std::cout << send_buf << std::endl;
-                            send(new_fd, send_buf.c_str(), 127, 0);
-                        }
+					std::string appDate;
+					std::string appTime;
+					int conflict = 1;
+					//Check for conflicting appointments
+					while(conflict) {
+						numbytes = recv(new_fd, recvbuf, 127, 0);
+						recvbuf[numbytes] = '\0';
+						appDate = recvbuf;
 
-                    }
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::string appReason = recvbuf;
+						numbytes = recv(new_fd, recvbuf, 127, 0);
+						recvbuf[numbytes] = '\0';
+						appTime = recvbuf;
 
-                    user.createAppointment(username, appReason, appDate, appTime);
+						conflict = user.conflictCheck(appDate, appTime, username);
+						if (conflict) {
+							send_buf = "Failure";
+							std::cout << send_buf << std::endl;
+							send(new_fd, send_buf.c_str(), 127, 0);
+						} else {
+							send_buf = "Success";
+							std::cout << send_buf << std::endl;
+							send(new_fd, send_buf.c_str(), 127, 0);
+						}
 
-                    send_buf = "Success added appointment at: " + appDate + " at " + appTime + " for "+ appReason;
-                    send(new_fd, send_buf.c_str(), 127, 0);
+					}
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::string appReason = recvbuf;
 
-                    user.write();
-                }
-                else if(!choice.compare("7")){
-                    //F) Remove an appointment
-                    send_buf = user.sendAllAppointments(username);
-                    send(new_fd, send_buf.c_str(), 512, 0);
+					user.createAppointment(username, appReason, appDate, appTime);
 
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::string appDate = recvbuf;
+					send_buf = "Success added appointment at: " + appDate + " at " + appTime + " for "+ appReason;
+					send(new_fd, send_buf.c_str(), 127, 0);
 
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::string appTime = recvbuf;
+					user.write();
+				}
+				else if(!choice.compare("2")){
+					//F) Remove an appointment
+					send_buf = user.sendAllAppointments(username);
+					send(new_fd, send_buf.c_str(), 512, 0);
 
-                    user.removeAppointment(username, appDate, appTime);
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::string appDate = recvbuf;
 
-                    send_buf = "Success removed appointment at: " + appDate + " " + appTime;
-                    send(new_fd, send_buf.c_str(), 127, 0);
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::string appTime = recvbuf;
 
-                    user.write();
-                }
-                else if(!choice.compare("8")){
-                    //F) Update an appointment
-                    send_buf = user.sendAllAppointments(username);
-                    send(new_fd, send_buf.c_str(), 512, 0);
+					user.removeAppointment(username, appDate, appTime);
 
-                    std::string appDate;
-                    std::string appTime;
-                    int conflict = 1;
-                    //Check for conflicting appointments
-                    while(conflict){
-                        numbytes=recv(new_fd, recvbuf, 127, 0);
-                        recvbuf[numbytes] = '\0';
-                        appDate = recvbuf;
+					send_buf = "Success removed appointment at: " + appDate + " " + appTime;
+					send(new_fd, send_buf.c_str(), 127, 0);
 
-                        numbytes=recv(new_fd, recvbuf, 127, 0);
-                        recvbuf[numbytes] = '\0';
-                        appTime = recvbuf;
+					user.write();
+				}
+				else if(!choice.compare("3")){
+					//F) Update an appointment
+					send_buf = user.sendAllAppointments(username);
+					send(new_fd, send_buf.c_str(), 512, 0);
 
-                        conflict = user.conflictCheck(appDate, appTime, username);
-                        if(conflict){
-                            send_buf = "Failure";
-                            std::cout << send_buf << std::endl;
-                            send(new_fd, send_buf.c_str(), 127, 0);
-                        }else{
-                            send_buf = "Success";
-                            std::cout << send_buf <<std::endl;
-                            send(new_fd, send_buf.c_str(), 127, 0);
-                        }
+					std::string appDate;
+					std::string appTime;
+					int conflict = 1;
+					//Check for conflicting appointments
+					while(conflict){
+						numbytes=recv(new_fd, recvbuf, 127, 0);
+						recvbuf[numbytes] = '\0';
+						appDate = recvbuf;
 
-                    }
+						numbytes=recv(new_fd, recvbuf, 127, 0);
+						recvbuf[numbytes] = '\0';
+						appTime = recvbuf;
 
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::string appReason = recvbuf;
+						conflict = user.conflictCheck(appDate, appTime, username);
+						if(conflict){
+							send_buf = "Failure";
+							std::cout << send_buf << std::endl;
+							send(new_fd, send_buf.c_str(), 127, 0);
+						}else{
+							send_buf = "Success";
+							std::cout << send_buf <<std::endl;
+							send(new_fd, send_buf.c_str(), 127, 0);
+						}
 
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::string oldAppTime = recvbuf;
+					}
 
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::string oldAppDate = recvbuf;
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::string appReason = recvbuf;
 
-                    user.removeAppointment(username, oldAppDate, oldAppTime);
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::string oldAppTime = recvbuf;
 
-                    user.createAppointment(username, appReason, appDate, appTime);
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::string oldAppDate = recvbuf;
 
-                    send_buf = "Success updated appointment to: " + appDate + " at " + appTime + " for "+ appReason;
-                    send(new_fd, send_buf.c_str(), 127, 0);
+					user.removeAppointment(username, oldAppDate, oldAppTime);
 
-                    user.write();
-                }
-                else if(!choice.compare("9")){
-                    //Send appointment at a time
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::string appDate = recvbuf;
+					user.createAppointment(username, appReason, appDate, appTime);
 
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::string appTime = recvbuf;
+					send_buf = "Success updated appointment to: " + appDate + " at " + appTime + " for "+ appReason;
+					send(new_fd, send_buf.c_str(), 127, 0);
 
-                    send_buf = user.readAppointment(appDate, appTime);
-                    send(new_fd, send_buf.c_str(), 127, 0);
+					user.write();
+				}
+				else if(!choice.compare("4")){
+					//Send appointment at a time
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::string appDate = recvbuf;
 
-                }
-                else if(!choice.compare("10")){
-                    //Send appointment in range
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::string startDate = recvbuf;
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::string appTime = recvbuf;
 
-                    numbytes=recv(new_fd, recvbuf, 127, 0);
-                    recvbuf[numbytes] = '\0';
-                    std::string endDate = recvbuf;
+					send_buf = user.readAppointment(appDate, appTime);
+					send(new_fd, send_buf.c_str(), 127, 0);
 
-                    send_buf = "Found these appointments in range: " + startDate + " to " + endDate +"\n"
-                            + user.rangeReturnAppointments(startDate, endDate);
-                    send(new_fd, send_buf.c_str(), 512, 0);
+				}
+				else if(!choice.compare("5")){
+					//Send appointment in range
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::string startDate = recvbuf;
 
-                    send_buf = "Success";
-                    send(new_fd, send_buf.c_str(), 127, 0);
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::string endDate = recvbuf;
 
-                }
-                else if(!choice.compare("11") || !choice.compare("k")){
-                    user.write();
-                    close(new_fd);
-                    _Exit(0);
-                }
-                else{}
+					send_buf = "Found these appointments in range: " + startDate + " to " + endDate +"\n"
+							+ user.rangeReturnAppointments(startDate, endDate);
+					send(new_fd, send_buf.c_str(), 512, 0);
 
-            }
-        }
-        close(new_fd);
-    }
+					send_buf = "Success";
+					send(new_fd, send_buf.c_str(), 127, 0);
 
-    user.write();
-    return 0;
+				}
+				else if(!choice.compare("6")) {
+					// A) Modify name
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					user.setName(recvbuf);
+					user.write();
+					send_buf = "Success";
+					send(new_fd, send_buf.c_str(), 127, 0);
+					std::cout << "Modified name: "<< recvbuf << std::endl;
+
+				}
+				else if(!choice.compare("7")){
+					//B) Modify password
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					user.setPassword(recvbuf);
+					user.write();
+					send_buf = "Success";
+					send(new_fd, send_buf.c_str(), 127, 0);
+					std::cout << "Modified password: "<< recvbuf << std::endl;
+				}
+				else if(!choice.compare("8")){
+					//C) Modify phone number
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					user.setPhone(recvbuf);
+					user.write();
+					send_buf = "Success";
+					send(new_fd, send_buf.c_str(), 127, 0);
+					std::cout << "Modified phone number: "<< recvbuf << std::endl;
+				}
+				else if(!choice.compare("9")){
+					//D) Modify email
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					user.setEmail(recvbuf);
+					user.write();
+					send_buf = "Success";
+					send(new_fd, send_buf.c_str(), 127, 0);
+					std::cout << "Modified email: "<< recvbuf << std::endl;
+				}
+				else if(!choice.compare("10")){
+					//E) Delete a user
+					numbytes=recv(new_fd, recvbuf, 127, 0);
+					recvbuf[numbytes] = '\0';
+					std::string check = recvbuf;
+					if(!check.compare("Y") || !check.compare("y")){
+						user.remove();
+						send_buf = "Success";
+						send(new_fd, send_buf.c_str(), 127, 0);
+						_Exit(0);
+					}else{
+						send_buf = "Cancelled";
+						send(new_fd, send_buf.c_str(), 127, 0);
+					}
+				}
+				else if(!choice.compare("11") || !choice.compare("k")){
+					user.write();
+					close(new_fd);
+					_Exit(0);
+				}
+				else{}
+
+			}
+		}
+		close(new_fd);
+	}
+
+	user.write();
+	return 0;
 }

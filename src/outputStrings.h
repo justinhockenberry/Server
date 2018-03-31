@@ -11,17 +11,18 @@
 #include <string>
 
 std::string menu = "Please make a selection:\n"
-        "1) Modify name\n"
-        "2) Modify password\n"
-        "3) Modify phone number\n"
-        "4) Modify email\n"
-        "5) Delete a user\n"
-        "6) Add a new appointment\n"
-        "7) Remove an appointment\n"
-        "8) Update an existing appointment\n"
-        "9) Display appointment at a time\n"
-        "10) Display appointments in a time range\n"
-        "11) Exit\n";
+        "1) Add a new appointment\n"
+        "2) Remove an appointment\n"
+		"3) Update an existing appointment\n"
+		"4) Display appointment at a time\n"
+		"5) Display appointments in a time range\n"
+		"6) Modify name\n"
+		"7) Modify password\n"
+		"8) Modify phone number\n"
+		"9) Modify email\n"
+		"10) Delete a user\n"
+		"11) Exit\n";
+
 std::string usernameRequest = "";
 
 //"A) Modify name, password, contact phone number, and email\n"
@@ -30,6 +31,7 @@ std::string modificationMenu = "Please select what you would like to modify:\n"
         "2) Password\n"
         "3) Phone Number\n"
         "4) Email\n\n";
+
 std::string modification = "Please enter new value: \n";
 std::string modSuccess = "Value successfully updated\n";
 
