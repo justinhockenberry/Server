@@ -1,11 +1,11 @@
-serverRun: Server.o DAL.o
-	g++ -std=c++11 Server.o DAL.o -o serverRun
+serverRun: Server.o User.o
+	g++ -std=c++11 Server.o User.o -o serverRun
 
 Client.o: Server.cpp
 	g++ -c -std=c++11 Server.cpp
 
-Utilities.o: DAL.cpp
-	g++ -c -std=c++11 DAL.cpp
+Utilities.o: User.cpp
+	g++ -c -std=c++11 User.cpp
 
 clean:
 	rm *.o serverRun

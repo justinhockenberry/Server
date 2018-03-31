@@ -23,7 +23,8 @@
 #include <algorithm>
 
 #include "outputStrings.h"
-#include "DAL.h"
+//#include "DAL.h"
+#include "User.h"
 
 #define MYPORT 336958
 #define BACKLOG 10
@@ -47,7 +48,8 @@ int main(void) {
     char *caddr;
     char* recieved;
     long numbytes;
-    DAL user = DAL();
+//    DAL user = DAL();
+    User user= User();
 
 
     /*
@@ -97,7 +99,7 @@ int main(void) {
             perror("accept");
             exit(1);
         }
-        printf("server: got connection from %s\n",  inet_ntoa(their_addr.sin_addr));
+        printf("[Server] got connection from %s\n",  inet_ntoa(their_addr.sin_addr));
         //Creating threads for each client connection
         if(!fork()){
             close(sockfd);
@@ -126,7 +128,7 @@ int main(void) {
                 /*
                  * If user decides to login
                  */
-                if(!loginChoice.compare("A") || !loginChoice.compare("a")){
+                if(!loginChoice.compare("1")){
                     while(!validated) {
 
                         //recieve username
@@ -170,7 +172,7 @@ int main(void) {
                  * If user wants to create a new account
                  */
                 }
-                else if(!loginChoice.compare("B") || !loginChoice.compare("b")){
+                else if(!loginChoice.compare("2")){
                     //receive username and check if user already exists
                     bool exists = true;
                     while(exists){
@@ -265,7 +267,7 @@ int main(void) {
                  *
                  *
                  */
-                if(!choice.compare("A") || !choice.compare("a")) {
+                if(!choice.compare("1")) {
                     // A) Modify name
                     numbytes=recv(new_fd, recvbuf, 127, 0);
                     recvbuf[numbytes] = '\0';
@@ -276,7 +278,7 @@ int main(void) {
                     std::cout << "Modified name: "<< recvbuf << std::endl;
 
                 }
-                else if(!choice.compare("B") || !choice.compare("b")){
+                else if(!choice.compare("2")){
                     //B) Modify password
                     numbytes=recv(new_fd, recvbuf, 127, 0);
                     recvbuf[numbytes] = '\0';
@@ -286,7 +288,7 @@ int main(void) {
                     send(new_fd, send_buf.c_str(), 127, 0);
                     std::cout << "Modified password: "<< recvbuf << std::endl;
                 }
-                else if(!choice.compare("C") || !choice.compare("c")){
+                else if(!choice.compare("3")){
                     //C) Modify phone number
                     numbytes=recv(new_fd, recvbuf, 127, 0);
                     recvbuf[numbytes] = '\0';
@@ -296,7 +298,7 @@ int main(void) {
                     send(new_fd, send_buf.c_str(), 127, 0);
                     std::cout << "Modified phone number: "<< recvbuf << std::endl;
                 }
-                else if(!choice.compare("D") || !choice.compare("d")){
+                else if(!choice.compare("4")){
                     //D) Modify email
                     numbytes=recv(new_fd, recvbuf, 127, 0);
                     recvbuf[numbytes] = '\0';
@@ -306,7 +308,7 @@ int main(void) {
                     send(new_fd, send_buf.c_str(), 127, 0);
                     std::cout << "Modified email: "<< recvbuf << std::endl;
                 }
-                else if(!choice.compare("E") || !choice.compare("e")){
+                else if(!choice.compare("5")){
                     //E) Delete a user
                     numbytes=recv(new_fd, recvbuf, 127, 0);
                     recvbuf[numbytes] = '\0';
@@ -321,7 +323,7 @@ int main(void) {
                         send(new_fd, send_buf.c_str(), 127, 0);
                     }
                 }
-                else if(!choice.compare("F") || !choice.compare("f")){
+                else if(!choice.compare("6")){
                     //F) Add a new appointment
                     send_buf = user.sendAllAppointments(username);
                     send(new_fd, send_buf.c_str(), 512, 0);
@@ -362,7 +364,7 @@ int main(void) {
 
                     user.write();
                 }
-                else if(!choice.compare("G") || !choice.compare("g")){
+                else if(!choice.compare("7")){
                     //F) Remove an appointment
                     send_buf = user.sendAllAppointments(username);
                     send(new_fd, send_buf.c_str(), 512, 0);
@@ -382,7 +384,7 @@ int main(void) {
 
                     user.write();
                 }
-                else if(!choice.compare("H") || !choice.compare("h")){
+                else if(!choice.compare("8")){
                     //F) Update an appointment
                     send_buf = user.sendAllAppointments(username);
                     send(new_fd, send_buf.c_str(), 512, 0);
@@ -434,7 +436,7 @@ int main(void) {
 
                     user.write();
                 }
-                else if(!choice.compare("I") || !choice.compare("i")){
+                else if(!choice.compare("9")){
                     //Send appointment at a time
                     numbytes=recv(new_fd, recvbuf, 127, 0);
                     recvbuf[numbytes] = '\0';
@@ -448,7 +450,7 @@ int main(void) {
                     send(new_fd, send_buf.c_str(), 127, 0);
 
                 }
-                else if(!choice.compare("J") || !choice.compare("j")){
+                else if(!choice.compare("10")){
                     //Send appointment in range
                     numbytes=recv(new_fd, recvbuf, 127, 0);
                     recvbuf[numbytes] = '\0';
@@ -466,7 +468,7 @@ int main(void) {
                     send(new_fd, send_buf.c_str(), 127, 0);
 
                 }
-                else if(!choice.compare("K") || !choice.compare("k")){
+                else if(!choice.compare("11") || !choice.compare("k")){
                     user.write();
                     close(new_fd);
                     _Exit(0);

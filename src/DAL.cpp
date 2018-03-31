@@ -169,4 +169,5 @@ std::string DAL::rangeReturnAppointments(std::string start, std::string end) {
 //
 //    }
     std::cout << appointments;
-return appointments;}
+return appointments;
+}
