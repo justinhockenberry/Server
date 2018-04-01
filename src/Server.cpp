@@ -225,8 +225,6 @@ int main(void) {
 					close(new_fd);
 					_Exit(0);
 				}
-				else{}
-
 			}
 		}
 		close(new_fd);

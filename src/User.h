@@ -57,7 +57,7 @@ public:
 	const string NAME = "name";
 	const string PHONE = "phone";
 
-	void print();
+//	void print();
 	void write();
 	void remove();
 	string readAppointment(string date, string time);

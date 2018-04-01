@@ -37,7 +37,7 @@ MenuOptions::MenuOptions() {
 MenuOptions::~MenuOptions() {
 }
 
-bool MenuOptions::login(int new_fd, char *recvbuf, User user, bool loggedIn) {
+bool MenuOptions::login(int new_fd, char *recvbuf, User &user, bool loggedIn) {
 
 	string send_buf;
 	string username;
@@ -79,7 +79,7 @@ bool MenuOptions::login(int new_fd, char *recvbuf, User user, bool loggedIn) {
 
 }
 
-bool MenuOptions::newAccount(int new_fd, char *recvbuf, User user, bool loggedIn) {
+bool MenuOptions::newAccount(int new_fd, char *recvbuf, User &user, bool loggedIn) {
 
 	bool exists = true;
 	string send_buf;
@@ -141,7 +141,7 @@ bool MenuOptions::newAccount(int new_fd, char *recvbuf, User user, bool loggedIn
 	return loggedIn = true;
 }
 
-void MenuOptions::addAppointment(int new_fd, char *recvbuf, User user) {
+void MenuOptions::addAppointment(int new_fd, char *recvbuf, User &user) {
 
 	string send_buf;
 	string username;
@@ -188,7 +188,7 @@ void MenuOptions::addAppointment(int new_fd, char *recvbuf, User user) {
 
 }
 
-void MenuOptions::deleteAppointment(int new_fd, char *recvbuf, User user) {
+void MenuOptions::deleteAppointment(int new_fd, char *recvbuf, User &user) {
 
 	string send_buf;
 	string username;
@@ -214,7 +214,7 @@ void MenuOptions::deleteAppointment(int new_fd, char *recvbuf, User user) {
 
 }
 
-void MenuOptions::updateAppointment(int new_fd, char *recvbuf, User user) {
+void MenuOptions::updateAppointment(int new_fd, char *recvbuf, User &user) {
 	string send_buf;
 	string username;
 	long numbytes;
@@ -270,7 +270,7 @@ void MenuOptions::updateAppointment(int new_fd, char *recvbuf, User user) {
 	user.write();
 }
 
-void MenuOptions::displayAppointTime(int new_fd, char *recvbuf, User user) {
+void MenuOptions::displayAppointTime(int new_fd, char *recvbuf, User &user) {
 	string send_buf;
 	long numbytes;
 
@@ -286,7 +286,7 @@ void MenuOptions::displayAppointTime(int new_fd, char *recvbuf, User user) {
 	send(new_fd, send_buf.c_str(), 127, 0);
 }
 
-void MenuOptions::displayAppointRange(int new_fd, char *recvbuf, User user) {
+void MenuOptions::displayAppointRange(int new_fd, char *recvbuf, User &user) {
 
 	string send_buf;
 	long numbytes;
@@ -306,7 +306,7 @@ void MenuOptions::displayAppointRange(int new_fd, char *recvbuf, User user) {
 	send_buf = "Success";
 	send(new_fd, send_buf.c_str(), 127, 0);
 }
-void MenuOptions::changeName(int new_fd, char *recvbuf, User user) {
+void MenuOptions::changeName(int new_fd, char *recvbuf, User &user) {
 
 	string send_buf;
 	long numbytes;
@@ -319,7 +319,7 @@ void MenuOptions::changeName(int new_fd, char *recvbuf, User user) {
 	send(new_fd, send_buf.c_str(), 127, 0);
 	cout << "Modified name: "<< recvbuf << endl;
 }
-void MenuOptions::changePassword(int new_fd, char *recvbuf, User user) {
+void MenuOptions::changePassword(int new_fd, char *recvbuf, User &user) {
 
 	string send_buf;
 	long numbytes;
@@ -333,7 +333,7 @@ void MenuOptions::changePassword(int new_fd, char *recvbuf, User user) {
 	cout << "Modified password: "<< recvbuf << endl;
 
 }
-void MenuOptions::changePhone(int new_fd, char *recvbuf, User user) {
+void MenuOptions::changePhone(int new_fd, char *recvbuf, User &user) {
 
 	string send_buf;
 	long numbytes;
@@ -347,7 +347,7 @@ void MenuOptions::changePhone(int new_fd, char *recvbuf, User user) {
 	cout << "Modified phone number: "<< recvbuf << endl;
 
 }
-void MenuOptions::changeEmail(int new_fd, char *recvbuf, User user) {
+void MenuOptions::changeEmail(int new_fd, char *recvbuf, User &user) {
 
 	string send_buf;
 	long numbytes;
@@ -360,13 +360,14 @@ void MenuOptions::changeEmail(int new_fd, char *recvbuf, User user) {
 	send(new_fd, send_buf.c_str(), 127, 0);
 	cout << "Modified email: "<< recvbuf << endl;
 }
-void MenuOptions::deleteUser(int new_fd, char *recvbuf, User user) {
+void MenuOptions::deleteUser(int new_fd, char *recvbuf, User &user) {
 	string send_buf;
 	long numbytes;
 
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
 	string check = recvbuf;
+
 	if(!check.compare("Y") || !check.compare("y")){
 		user.remove();
 		send_buf = "Success";
