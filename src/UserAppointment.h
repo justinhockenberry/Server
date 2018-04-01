@@ -8,32 +8,43 @@
 #ifndef USERAPPOINTMENT_H_
 #define USERAPPOINTMENT_H_
 
-
+using std::string;
 class UserAppointment {
 
 private:
-	std::string beginTime;
-	std::string endTime;
-	std::string place;
-	std::string memo;
-	std::string name;
+	string beginTime;
+	string endTime;
+	string place;
+	string memo;
+	string name;
 
 
 public:
 	UserAppointment();
 	virtual ~UserAppointment();
 
+	void setBeginTime(string beginTime);
+	void setEndTime(string endTime);
+	void setPlace(string place);
+	void setMemo(string memo);
+	void setName(string name);
 
-	const std::string &getBeginTime();
-	void setBeginTime(const std::string &beginTime);
-	const std::string &getEndTime();
-	void setEndTime(const std::string &endTime);
-	const std::string &getPlace();
-	void setPlace(const std::string &place);
-	const std::string &geMemo();
-	void setMemo(const std::string &memo);
-	const std::string &getName();
-	void setName(const std::string &name);
+
+	const string getBeginTime() {
+		return beginTime;
+	}
+	const string getEndTime() {
+		return endTime;
+	}
+	const string getPlace() {
+		return place;
+	}
+	const string getMemo() {
+		return memo;
+	}
+	const string getName() {
+		return name;
+	}
 };
 
 #endif /* USERAPPOINTMENT_H_ */

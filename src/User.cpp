@@ -15,6 +15,14 @@
 #include "User.h"
 
 using std::string;
+using std::ifstream;
+using std::ofstream;
+using std::getline;
+using std::stringstream;
+using std::vector;
+using std::cout;
+
+
 
 User::User() {
 
@@ -25,25 +33,25 @@ User::~User() {
 
 }
 
-void User::populate(std::string username) {
+void User::populate(string username) {
 
-	std::string filename = username+".txt";
+	string filename = username+".txt";
 
-	std::ifstream infile(filename.c_str());
-	std::getline(infile, this->username);
-	std::getline(infile, this->password);
-	std::getline(infile, this->name);
-	std::getline(infile, this->phone);
-	std::getline(infile, this->email);
+	ifstream infile(filename.c_str());
+	getline(infile, this->username);
+	getline(infile, this->password);
+	getline(infile, this->name);
+	getline(infile, this->phone);
+	getline(infile, this->email);
 
-	std::string entry;
-	while(std::getline(infile, entry)){
+	string entry;
+	while(getline(infile, entry)){
 
-		std::stringstream stream(entry);
-		std::vector<std::string> fields;
-		std::string token;
+		stringstream stream(entry);
+		vector<string> fields;
+		string token;
 
-		while(std::getline(stream, token, ';')){
+		while(getline(stream, token, ';')){
 			fields.push_back(token);
 		}
 
@@ -65,49 +73,49 @@ void User::populate(std::string username) {
 
 void User::print() {
 
-	std::cout << this->username << "\n" << this->password <<  "\n" << this->name << "\n" << this->phone << "\n"
+	cout << this->username << "\n" << this->password <<  "\n" << this->name << "\n" << this->phone << "\n"
 			<< this->email << "\n";
-	//    for(std::pair<std::string , userAppointment>  i: appointmentTable){
-	//        std::cout << i.second.date << " " << i.second.time << " " << i.second.reason << "\n";
+	//    for(pair<string , userAppointment>  i: appointmentTable){
+	//        cout << i.second.date << " " << i.second.time << " " << i.second.reason << "\n";
 	//    }
 }
 
 void User::write() {
-	std::string filename = this->username + ".txt";
-	std::ofstream ofstream(filename.c_str());
+	string filename = this->username + ".txt";
+	ofstream ofstream(filename.c_str());
 	ofstream << this->username << "\n" << this->password <<  "\n" << this->name << "\n" << this->phone << "\n"
 			<< this->email << "\n";
-	//    for(std::pair<std::string , userAppointment>  i: appointmentTable){
+	//    for(pair<string , userAppointment>  i: appointmentTable){
 	//        ofstream << this->username << ";" << i.second.reason << ";" << i.second.date << ";" << i.second.time << "\n";
 	//    }
 	ofstream.close();
 }
 
 
-std::string User::readPassword(std::string) {
+string User::readPassword(string) {
 	return this->password;
 }
 
 
-bool User::exists(std::string username) {
-	std::string filename = username + ".txt";
-	std::ifstream infile(filename.c_str());
+bool User::exists(string username) {
+	string filename = username + ".txt";
+	ifstream infile(filename.c_str());
 	return infile.is_open();
 }
 
 
 void User::remove() {
-	std::string fileName = this->username + ".txt";
+	string fileName = this->username + ".txt";
 	std::remove(fileName.c_str());
 }
 
 
-int User::conflictCheck(std::string date, std::string time, std::string username) {
+int User::conflictCheck(string date, string time, string username) {
 	return appointmentTable.count(date+time);
 }
 
 
-void User::createAppointment(std::string username, std::string reason, std::string date, std::string time) {
+void User::createAppointment(string username, string reason, string date, string time) {
 	appointmentTable[date+time].reason = reason;
 	appointmentTable[date+time].date = date;
 	appointmentTable[date+time].time = time;
@@ -115,14 +123,14 @@ void User::createAppointment(std::string username, std::string reason, std::stri
 }
 
 
-void User::removeAppointment(std::string username, std::string date, std::string time) {
+void User::removeAppointment(string username, string date, string time) {
 	appointmentTable.erase(date+time);
 }
 
 
-std::string User::sendAllAppointments(std::string username) {
-	std::string appointments;
-	//    for(std::pair<std::string, userAppointment> appointment : appointmentTable ){
+string User::sendAllAppointments(string username) {
+	string appointments;
+	//    for(pair<string, userAppointment> appointment : appointmentTable ){
 	//
 	//        appointments += (appointment.second.reason + " on " + appointment.second.date
 	//                         + " at " + appointment.second.time + "\n");
@@ -131,7 +139,7 @@ std::string User::sendAllAppointments(std::string username) {
 	return appointments;}
 
 
-std::string User::readAppointment(std::string date, std::string time) {
+string User::readAppointment(string date, string time) {
 
 	return "On " + this->appointmentTable[date+time].date +" at " +
 			this->appointmentTable[date+time].time + " for " +
@@ -140,39 +148,39 @@ std::string User::readAppointment(std::string date, std::string time) {
 }
 
 
-std::string User::rangeReturnAppointments(std::string start, std::string end) {
-	std::string appointments = "";
-	std::stringstream startStream(start);
-	std::stringstream endStream(end);
-	std::string startMonth;
-	std::string endMonth;
-	std::string startDay;
-	std::string endDay;
-	std::string startYear;
-	std::string endYear;
+string User::rangeReturnAppointments(string start, string end) {
+	string appointments = "";
+	stringstream startStream(start);
+	stringstream endStream(end);
+	string startMonth;
+	string endMonth;
+	string startDay;
+	string endDay;
+	string startYear;
+	string endYear;
 
-	std::getline(startStream, startMonth, '/');
-	std::getline(startStream, startDay, '/');
-	std::getline(startStream, startYear);
+	getline(startStream, startMonth, '/');
+	getline(startStream, startDay, '/');
+	getline(startStream, startYear);
 
-	std::getline(endStream, endMonth, '/');
-	std::getline(endStream, endDay, '/');
-	std::getline(endStream, endYear);
+	getline(endStream, endMonth, '/');
+	getline(endStream, endDay, '/');
+	getline(endStream, endYear);
 
-	//    int startDate = std::stoi(startDay) + std::stoi(startMonth) * 100 + std::stoi(startYear) *10000;
-	//    int endDate = std::stoi(endDay) + std::stoi(endMonth) * 100 + std::stoi(endYear) *10000;
+	//    int startDate = stoi(startDay) + stoi(startMonth) * 100 + stoi(startYear) *10000;
+	//    int endDate = stoi(endDay) + stoi(endMonth) * 100 + stoi(endYear) *10000;
 
-	//    for(std::pair<std::string, userAppointment> appointment : this->appointmentTable ){
-	//        std::stringstream date(appointment.second.date);
-	//        std::string day;
-	//        std::string month;
-	//        std::string year;
+	//    for(pair<string, userAppointment> appointment : this->appointmentTable ){
+	//        stringstream date(appointment.second.date);
+	//        string day;
+	//        string month;
+	//        string year;
 	//
-	//        std::getline(date, month, '/');
-	//        std::getline(date, day, '/');
-	//        std::getline(date, year);
+	//        getline(date, month, '/');
+	//        getline(date, day, '/');
+	//        getline(date, year);
 	//
-	//        int dateValue = std::stoi(day) + std::stoi(month) * 100 + std::stoi(year) *10000;
+	//        int dateValue = stoi(day) + stoi(month) * 100 + stoi(year) *10000;
 	//
 	//        if(dateValue >= startDate && dateValue <= endDate){
 	//            appointments += (appointment.second.reason + " on " + appointment.second.date
@@ -180,7 +188,7 @@ std::string User::rangeReturnAppointments(std::string start, std::string end) {
 	//        }
 	//
 	//    }
-	std::cout << appointments;
+	cout << appointments;
 	return appointments;
 }
 
