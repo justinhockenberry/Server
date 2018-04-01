@@ -15,10 +15,11 @@ using std::string;
 using std::map;
 
 struct userAppointment{
+	string beginTime;
+	string endTime;
+	string place;
+	string memo;
 	string username;
-	string date;
-	string reason;
-	string time;
 };
 
 
@@ -32,10 +33,11 @@ private:
 	string email;
 
 	map<string, userAppointment> appointmentTable;
-	const int REASON_POS = 1;
+	const int MEMO_POS = 1;
 	const int USERNAME_POS = 0;
-	const int DATE_POS = 2;
-	const int TIME_POS = 3;
+	const int BEGIN_POS = 2;
+	const int END_POS = 3;
+	const int PLACE_POS = 4;
 
 public:
 	User();
@@ -48,7 +50,7 @@ public:
 	void populate(string username);
 	bool exists(string username);
 
-	void removeAppointment(string username, string date, string time);
+	void removeAppointment(string username, string beginTime);
 	string sendAllAppointments(string username);
 	string readPassword(string);
 
@@ -60,9 +62,9 @@ public:
 //	void print();
 	void write();
 	void remove();
-	string readAppointment(string date, string time);
-	int conflictCheck(string date, string time, string username);
-	void createAppointment(string username, string reason, string date, string time);
+	string readAppointment(string beginTime);
+	int conflictCheck(string beginTime, string username);
+	void createAppointment(string username, string memo, string beginTime, string endTime, string place);
 	string rangeReturnAppointments(string start, string end);
 
 	// Getters

@@ -150,20 +150,19 @@ void MenuOptions::addAppointment(int new_fd, char *recvbuf, User &user) {
 	send_buf = user.sendAllAppointments(username);
 	send(new_fd, send_buf.c_str(), 512, 0);
 
-	string appDate;
-	string appTime;
+	string beginTime;
 	int conflict = 1;
 	//Check for conflicting appointments
 	while(conflict) {
 		numbytes = recv(new_fd, recvbuf, 127, 0);
 		recvbuf[numbytes] = '\0';
-		appDate = recvbuf;
+		beginTime = recvbuf;
 
-		numbytes = recv(new_fd, recvbuf, 127, 0);
-		recvbuf[numbytes] = '\0';
-		appTime = recvbuf;
+//		numbytes = recv(new_fd, recvbuf, 127, 0);
+//		recvbuf[numbytes] = '\0';
+//		appTime = recvbuf;
 
-		conflict = user.conflictCheck(appDate, appTime, username);
+		conflict = user.conflictCheck(beginTime, username);
 		if (conflict) {
 			send_buf = "Failure";
 			cout << send_buf << endl;
@@ -177,11 +176,19 @@ void MenuOptions::addAppointment(int new_fd, char *recvbuf, User &user) {
 	}
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
-	string appReason = recvbuf;
+	string endTime = recvbuf;
 
-	user.createAppointment(username, appReason, appDate, appTime);
+	numbytes=recv(new_fd, recvbuf, 127, 0);
+	recvbuf[numbytes] = '\0';
+	string memo = recvbuf;
 
-	send_buf = "Success added appointment at: " + appDate + " at " + appTime + " for "+ appReason;
+	numbytes=recv(new_fd, recvbuf, 127, 0);
+	recvbuf[numbytes] = '\0';
+	string place = recvbuf;
+
+	user.createAppointment(username, memo, beginTime, endTime, place);
+
+	send_buf = "Success added appointment at: " + beginTime + " to " + endTime + " at " + place +" for "+ memo;
 	send(new_fd, send_buf.c_str(), 127, 0);
 
 	user.write();
@@ -199,15 +206,15 @@ void MenuOptions::deleteAppointment(int new_fd, char *recvbuf, User &user) {
 
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
-	string appDate = recvbuf;
+	string beginTime = recvbuf;
 
-	numbytes=recv(new_fd, recvbuf, 127, 0);
-	recvbuf[numbytes] = '\0';
-	string appTime = recvbuf;
+//	numbytes=recv(new_fd, recvbuf, 127, 0);
+//	recvbuf[numbytes] = '\0';
+//	string appTime = recvbuf;
 
-	user.removeAppointment(username, appDate, appTime);
+	user.removeAppointment(username, beginTime);
 
-	send_buf = "Success removed appointment at: " + appDate + " " + appTime;
+	send_buf = "Success removed appointment at: " + beginTime;
 	send(new_fd, send_buf.c_str(), 127, 0);
 
 	user.write();
@@ -222,20 +229,19 @@ void MenuOptions::updateAppointment(int new_fd, char *recvbuf, User &user) {
 	send_buf = user.sendAllAppointments(username);
 	send(new_fd, send_buf.c_str(), 512, 0);
 
-	string appDate;
-	string appTime;
+	string beginTime;
 	int conflict = 1;
 	//Check for conflicting appointments
 	while(conflict){
 		numbytes=recv(new_fd, recvbuf, 127, 0);
 		recvbuf[numbytes] = '\0';
-		appDate = recvbuf;
+		beginTime = recvbuf;
 
-		numbytes=recv(new_fd, recvbuf, 127, 0);
-		recvbuf[numbytes] = '\0';
-		appTime = recvbuf;
+//		numbytes=recv(new_fd, recvbuf, 127, 0);
+//		recvbuf[numbytes] = '\0';
+//		appTime = recvbuf;
 
-		conflict = user.conflictCheck(appDate, appTime, username);
+		conflict = user.conflictCheck(beginTime, username);
 		if(conflict){
 			send_buf = "Failure";
 			cout << send_buf << endl;
@@ -250,21 +256,25 @@ void MenuOptions::updateAppointment(int new_fd, char *recvbuf, User &user) {
 
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
-	string appReason = recvbuf;
+	string memo = recvbuf;
 
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
-	string oldAppTime = recvbuf;
+	string beginTime = recvbuf;
 
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
-	string oldAppDate = recvbuf;
+	string endTime = recvbuf;
 
-	user.removeAppointment(username, oldAppDate, oldAppTime);
+	numbytes=recv(new_fd, recvbuf, 127, 0);
+	recvbuf[numbytes] = '\0';
+	string place = recvbuf;
 
-	user.createAppointment(username, appReason, appDate, appTime);
+	user.removeAppointment(username, beginTime);
 
-	send_buf = "Success updated appointment to: " + appDate + " at " + appTime + " for "+ appReason;
+	user.createAppointment(username, memo, beginTime, endTime, place);
+
+	send_buf = "Success updated appointment to: " + beginTime + " to " + endTime +" at " + place + " for "+ memo;
 	send(new_fd, send_buf.c_str(), 127, 0);
 
 	user.write();
@@ -276,13 +286,13 @@ void MenuOptions::displayAppointTime(int new_fd, char *recvbuf, User &user) {
 
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
-	string appDate = recvbuf;
+	string beginTime = recvbuf;
 
-	numbytes=recv(new_fd, recvbuf, 127, 0);
-	recvbuf[numbytes] = '\0';
-	string appTime = recvbuf;
+//	numbytes=recv(new_fd, recvbuf, 127, 0);
+//	recvbuf[numbytes] = '\0';
+//	string appTime = recvbuf;
 
-	send_buf = user.readAppointment(appDate, appTime);
+	send_buf = user.readAppointment(beginTime);
 	send(new_fd, send_buf.c_str(), 127, 0);
 }
 

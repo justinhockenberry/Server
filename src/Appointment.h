@@ -5,11 +5,13 @@
  *      Author: justin
  */
 
-#ifndef USERAPPOINTMENT_H_
-#define USERAPPOINTMENT_H_
+#ifndef APPOINTMENT_H_
+#define APPOINTMENT_H_
 
+#include <string>
 using std::string;
-class UserAppointment {
+
+class Appointment {
 
 private:
 	string beginTime;
@@ -20,8 +22,8 @@ private:
 
 
 public:
-	UserAppointment();
-	virtual ~UserAppointment();
+	Appointment();
+	virtual ~Appointment();
 
 	void setBeginTime(string beginTime);
 	void setEndTime(string endTime);
@@ -47,4 +49,4 @@ public:
 	}
 };
 
-#endif /* USERAPPOINTMENT_H_ */
+#endif /* APPOINTMENT_H_ */

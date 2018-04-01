@@ -5,9 +5,10 @@
  *      Author: justin
  */
 
+#include "Appointment.h"
+
 #include <string>
 
-#include "UserAppointment.h"
 
 using string;
 
