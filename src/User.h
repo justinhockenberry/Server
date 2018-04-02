@@ -33,10 +33,11 @@ private:
 	string email;
 
 	map<string, userAppointment> appointmentTable;
-	const int MEMO_POS = 1;
+
 	const int USERNAME_POS = 0;
-	const int BEGIN_POS = 2;
-	const int END_POS = 3;
+	const int BEGIN_POS = 1;
+	const int END_POS = 2;
+	const int MEMO_POS = 3;
 	const int PLACE_POS = 4;
 
 public:
