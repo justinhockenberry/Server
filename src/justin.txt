@@ -3,4 +3,5 @@ hello
 justin_hockenberry
 7203143577
 hock@gmail.com
-justin;say sup;05/06/2018;15:00
+justin;12:00 05/06/2018;14:00 05/06/2018;walk;indoors
+justin;20:00 05/05/2018;22:00 05/05/2018;RUN;outside

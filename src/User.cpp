@@ -146,6 +146,8 @@ string User::rangeReturnAppointments(string start, string end) {
 	string appointments = "";
 	stringstream startStream(start);
 	stringstream endStream(end);
+	string startTime;
+	string endTime;
 	string startMonth;
 	string endMonth;
 	string startDay;
@@ -153,10 +155,12 @@ string User::rangeReturnAppointments(string start, string end) {
 	string startYear;
 	string endYear;
 
+	getline(startStream, startTime, ' ');
 	getline(startStream, startMonth, '/');
 	getline(startStream, startDay, '/');
 	getline(startStream, startYear);
 
+	getline(endStream, endTime, ' ');
 	getline(endStream, endMonth, '/');
 	getline(endStream, endDay, '/');
 	getline(endStream, endYear);

@@ -151,6 +151,7 @@ void MenuOptions::addAppointment(int new_fd, char *recvbuf, User &user) {
 	send(new_fd, send_buf.c_str(), 512, 0);
 
 	string beginTime;
+	string endTime;
 	int conflict = 1;
 	//Check for conflicting appointments
 	while(conflict) {
@@ -158,9 +159,10 @@ void MenuOptions::addAppointment(int new_fd, char *recvbuf, User &user) {
 		recvbuf[numbytes] = '\0';
 		beginTime = recvbuf;
 
-//		numbytes = recv(new_fd, recvbuf, 127, 0);
-//		recvbuf[numbytes] = '\0';
-//		appTime = recvbuf;
+		numbytes=recv(new_fd, recvbuf, 127, 0);
+		recvbuf[numbytes] = '\0';
+		endTime = recvbuf;
+
 
 		conflict = user.conflictCheck(beginTime, username);
 		if (conflict) {
@@ -174,9 +176,7 @@ void MenuOptions::addAppointment(int new_fd, char *recvbuf, User &user) {
 		}
 
 	}
-	numbytes=recv(new_fd, recvbuf, 127, 0);
-	recvbuf[numbytes] = '\0';
-	string endTime = recvbuf;
+
 
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
@@ -230,6 +230,7 @@ void MenuOptions::updateAppointment(int new_fd, char *recvbuf, User &user) {
 	send(new_fd, send_buf.c_str(), 512, 0);
 
 	string beginTime;
+	string endTime;
 	int conflict = 1;
 	//Check for conflicting appointments
 	while(conflict){
@@ -237,9 +238,9 @@ void MenuOptions::updateAppointment(int new_fd, char *recvbuf, User &user) {
 		recvbuf[numbytes] = '\0';
 		beginTime = recvbuf;
 
-//		numbytes=recv(new_fd, recvbuf, 127, 0);
-//		recvbuf[numbytes] = '\0';
-//		appTime = recvbuf;
+		numbytes=recv(new_fd, recvbuf, 127, 0);
+		recvbuf[numbytes] = '\0';
+		endTime = recvbuf;
 
 		conflict = user.conflictCheck(beginTime, username);
 		if(conflict){
@@ -260,17 +261,14 @@ void MenuOptions::updateAppointment(int new_fd, char *recvbuf, User &user) {
 
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
-	string beginTime = recvbuf;
-
-	numbytes=recv(new_fd, recvbuf, 127, 0);
-	recvbuf[numbytes] = '\0';
-	string endTime = recvbuf;
-
-	numbytes=recv(new_fd, recvbuf, 127, 0);
-	recvbuf[numbytes] = '\0';
 	string place = recvbuf;
 
-	user.removeAppointment(username, beginTime);
+	numbytes=recv(new_fd, recvbuf, 127, 0);
+	recvbuf[numbytes] = '\0';
+	string oldBeginTime = recvbuf;
+
+
+	user.removeAppointment(username, oldBeginTime);
 
 	user.createAppointment(username, memo, beginTime, endTime, place);
 
