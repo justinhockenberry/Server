@@ -56,9 +56,9 @@ bool MenuOptions::login(int new_fd, char *recvbuf, User &user, bool loggedIn) {
 	password = recvbuf;
 
 	//Login Successful
-	if(user.exists(username)){
-		user.populate(username);
-		if (!user.readPassword(username).compare(password)) {
+	if(user.findUserFile(username)){
+		user.getUserFileInfo(username);
+		if (!user.getPassword().compare(password)) {
 			send_buf = "Success";
 			send(new_fd, send_buf.c_str(), 127, 0);
 			cout << "[Server]: " << send_buf << "\n";
@@ -93,7 +93,7 @@ bool MenuOptions::newAccount(int new_fd, char *recvbuf, User &user, bool loggedI
 		cout << "[Client]: " << recvbuf << "\n";
 		username = recvbuf;
 
-		if(!user.exists(username)){
+		if(!user.findUserFile(username)){
 			send_buf = "Success";
 			send(new_fd, send_buf.c_str(), 127, 0);
 			cout << "[Server]: " << send_buf << "\n";
@@ -136,7 +136,7 @@ bool MenuOptions::newAccount(int new_fd, char *recvbuf, User &user, bool loggedI
 	string phone = recvbuf;
 	user.setPhone(phone);
 
-	user.write();
+	user.updateToFile();
 
 	return loggedIn = true;
 }
@@ -147,7 +147,7 @@ void MenuOptions::addAppointment(int new_fd, char *recvbuf, User &user) {
 	string username;
 	long numbytes;
 
-	send_buf = user.sendAllAppointments(username);
+	send_buf = user.getUserAppointments(username);
 	send(new_fd, send_buf.c_str(), 512, 0);
 
 	string beginTime;
@@ -164,7 +164,7 @@ void MenuOptions::addAppointment(int new_fd, char *recvbuf, User &user) {
 		endTime = recvbuf;
 
 
-		conflict = user.conflictCheck(beginTime, username);
+		conflict = user.findDuplicateUserFiles(beginTime, username);
 		if (conflict) {
 			send_buf = "Failure";
 			cout << send_buf << endl;
@@ -186,12 +186,12 @@ void MenuOptions::addAppointment(int new_fd, char *recvbuf, User &user) {
 	recvbuf[numbytes] = '\0';
 	string place = recvbuf;
 
-	user.createAppointment(username, memo, beginTime, endTime, place);
+	user.addAppointment(username, memo, beginTime, endTime, place);
 
 	send_buf = "Success added appointment at: " + beginTime + " to " + endTime + " at " + place +" for "+ memo;
 	send(new_fd, send_buf.c_str(), 127, 0);
 
-	user.write();
+	user.updateToFile();
 
 }
 
@@ -201,23 +201,19 @@ void MenuOptions::deleteAppointment(int new_fd, char *recvbuf, User &user) {
 	string username;
 	long numbytes;
 
-	send_buf = user.sendAllAppointments(username);
+	send_buf = user.getUserAppointments(username);
 	send(new_fd, send_buf.c_str(), 512, 0);
 
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
 	string beginTime = recvbuf;
 
-//	numbytes=recv(new_fd, recvbuf, 127, 0);
-//	recvbuf[numbytes] = '\0';
-//	string appTime = recvbuf;
-
 	user.removeAppointment(username, beginTime);
 
 	send_buf = "Success removed appointment at: " + beginTime;
 	send(new_fd, send_buf.c_str(), 127, 0);
 
-	user.write();
+	user.updateToFile();
 
 }
 
@@ -226,7 +222,7 @@ void MenuOptions::updateAppointment(int new_fd, char *recvbuf, User &user) {
 	string username;
 	long numbytes;
 
-	send_buf = user.sendAllAppointments(username);
+	send_buf = user.getUserAppointments(username);
 	send(new_fd, send_buf.c_str(), 512, 0);
 
 	string beginTime;
@@ -242,7 +238,7 @@ void MenuOptions::updateAppointment(int new_fd, char *recvbuf, User &user) {
 		recvbuf[numbytes] = '\0';
 		endTime = recvbuf;
 
-		conflict = user.conflictCheck(beginTime, username);
+		conflict = user.findDuplicateUserFiles(beginTime, username);
 		if(conflict){
 			send_buf = "Failure";
 			cout << send_buf << endl;
@@ -270,12 +266,12 @@ void MenuOptions::updateAppointment(int new_fd, char *recvbuf, User &user) {
 
 	user.removeAppointment(username, oldBeginTime);
 
-	user.createAppointment(username, memo, beginTime, endTime, place);
+	user.addAppointment(username, memo, beginTime, endTime, place);
 
 	send_buf = "Success updated appointment to: " + beginTime + " to " + endTime +" at " + place + " for "+ memo;
 	send(new_fd, send_buf.c_str(), 127, 0);
 
-	user.write();
+	user.updateToFile();
 }
 
 void MenuOptions::displayAppointTime(int new_fd, char *recvbuf, User &user) {
@@ -290,7 +286,7 @@ void MenuOptions::displayAppointTime(int new_fd, char *recvbuf, User &user) {
 //	recvbuf[numbytes] = '\0';
 //	string appTime = recvbuf;
 
-	send_buf = user.readAppointment(beginTime);
+	send_buf = user.getAppointment(beginTime);
 	send(new_fd, send_buf.c_str(), 127, 0);
 }
 
@@ -308,7 +304,7 @@ void MenuOptions::displayAppointRange(int new_fd, char *recvbuf, User &user) {
 	string endDate = recvbuf;
 
 	send_buf = "Found these appointments in range: " + startDate + " to " + endDate +"\n"
-			+ user.rangeReturnAppointments(startDate, endDate);
+			+ user.getAppointmentRange(startDate, endDate);
 	send(new_fd, send_buf.c_str(), 512, 0);
 
 	send_buf = "Success";
@@ -322,7 +318,7 @@ void MenuOptions::changeName(int new_fd, char *recvbuf, User &user) {
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
 	user.setName(recvbuf);
-	user.write();
+	user.updateToFile();
 	send_buf = "Success";
 	send(new_fd, send_buf.c_str(), 127, 0);
 	cout << "Modified name: "<< recvbuf << endl;
@@ -335,7 +331,7 @@ void MenuOptions::changePassword(int new_fd, char *recvbuf, User &user) {
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
 	user.setPassword(recvbuf);
-	user.write();
+	user.deleteUserFile();
 	send_buf = "Success";
 	send(new_fd, send_buf.c_str(), 127, 0);
 	cout << "Modified password: "<< recvbuf << endl;
@@ -349,7 +345,7 @@ void MenuOptions::changePhone(int new_fd, char *recvbuf, User &user) {
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
 	user.setPhone(recvbuf);
-	user.write();
+	user.updateToFile();
 	send_buf = "Success";
 	send(new_fd, send_buf.c_str(), 127, 0);
 	cout << "Modified phone number: "<< recvbuf << endl;
@@ -363,7 +359,7 @@ void MenuOptions::changeEmail(int new_fd, char *recvbuf, User &user) {
 	numbytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[numbytes] = '\0';
 	user.setEmail(recvbuf);
-	user.write();
+	user.updateToFile();
 	send_buf = "Success";
 	send(new_fd, send_buf.c_str(), 127, 0);
 	cout << "Modified email: "<< recvbuf << endl;
@@ -377,7 +373,7 @@ void MenuOptions::deleteUser(int new_fd, char *recvbuf, User &user) {
 	string check = recvbuf;
 
 	if(!check.compare("Y") || !check.compare("y")){
-		user.remove();
+		user.deleteUserFile();
 		send_buf = "Success";
 		send(new_fd, send_buf.c_str(), 127, 0);
 		_Exit(0);

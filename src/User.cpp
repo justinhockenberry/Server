@@ -33,7 +33,7 @@ User::~User() {
 
 }
 
-void User::populate(string username) {
+void User::getUserFileInfo(string username) {
 
 	string filename = username+".txt";
 
@@ -55,16 +55,16 @@ void User::populate(string username) {
 			fields.push_back(token);
 		}
 
-		userAppointment newAppointment;
+		appointment newAppointment;
 
-		newAppointment.username = fields[USERNAME_POS];
-		newAppointment.beginTime = fields[BEGIN_POS];
-		newAppointment.endTime = fields[END_POS];
-		newAppointment.memo = fields[MEMO_POS];
-		newAppointment.place = fields[PLACE_POS];
+		newAppointment.username = fields[0];
+		newAppointment.beginTime = fields[1];
+		newAppointment.endTime = fields[2];
+		newAppointment.memo = fields[3];
+		newAppointment.place = fields[4];
 
 
-		appointmentTable[fields[BEGIN_POS]] = newAppointment;
+		appointmentMap[fields[1]] = newAppointment;
 
 	}
 
@@ -72,58 +72,52 @@ void User::populate(string username) {
 
 }
 
-void User::write() {
+void User::updateToFile() {
 	string filename = this->username + ".txt";
 	ofstream ofstream(filename.c_str());
 	ofstream << this->username << "\n" << this->password <<  "\n" << this->name << "\n" << this->phone << "\n"
 			<< this->email << "\n";
-	    for(std::pair<string , userAppointment>  i: appointmentTable){
+	    for(std::pair<string , appointment>  i: appointmentMap){
 	        ofstream << this->username << ";" << i.second.beginTime << ";" << i.second.endTime << ";" << i.second.memo << ";" << i.second.place <<"\n";
 	    }
 	ofstream.close();
 }
 
-
-string User::readPassword(string) {
-	return this->password;
-}
-
-
-bool User::exists(string username) {
+bool User::findUserFile(string username) {
 	string filename = username + ".txt";
 	ifstream infile(filename.c_str());
 	return infile.is_open();
 }
 
 
-void User::remove() {
+void User::deleteUserFile() {
 	string fileName = this->username + ".txt";
 	std::remove(fileName.c_str());
 }
 
 
-int User::conflictCheck(string beginTime, string username) {
-	return appointmentTable.count(beginTime);
+int User::findDuplicateUserFiles(string beginTime, string username) {
+	return appointmentMap.count(beginTime);
 }
 
 
-void User::createAppointment(string username, string memo, string beginTime, string endTime, string place) {
-	appointmentTable[beginTime].memo = memo;
-	appointmentTable[beginTime].beginTime = beginTime;
-	appointmentTable[beginTime].endTime = endTime;
-	appointmentTable[beginTime].place = place;
-	appointmentTable[beginTime].username = username;
+void User::addAppointment(string username, string memo, string beginTime, string endTime, string place) {
+	appointmentMap[beginTime].memo = memo;
+	appointmentMap[beginTime].beginTime = beginTime;
+	appointmentMap[beginTime].endTime = endTime;
+	appointmentMap[beginTime].place = place;
+	appointmentMap[beginTime].username = username;
 }
 
 
 void User::removeAppointment(string username, string beginTime) {
-	appointmentTable.erase(beginTime);
+	appointmentMap.erase(beginTime);
 }
 
 
-string User::sendAllAppointments(string username) {
+string User::getUserAppointments(string username) {
 	string appointments;
-	    for(std::pair<string, userAppointment> appointment : appointmentTable ){
+	    for(std::pair<string, appointment> appointment : appointmentMap ){
 
 	        appointments += (appointment.second.memo + " from " + appointment.second.beginTime + " to " + appointment.second.endTime
 	                         + " located at " + appointment.second.place + "\n");
@@ -133,16 +127,16 @@ string User::sendAllAppointments(string username) {
 }
 
 
-string User::readAppointment(string beginTime) {
+string User::getAppointment(string beginTime) {
 
-	return "On " + this->appointmentTable[beginTime].beginTime +" at " +
-			this->appointmentTable[beginTime].place + " for " +
-			this->appointmentTable[beginTime].memo;
+	return "On " + this->appointmentMap[beginTime].beginTime +" at " +
+			this->appointmentMap[beginTime].place + " for " +
+			this->appointmentMap[beginTime].memo;
 
 }
 
 
-string User::rangeReturnAppointments(string start, string end) {
+string User::getAppointmentRange(string start, string end) {
 	string appointments = "";
 	stringstream startStream(start);
 	stringstream endStream(end);
@@ -168,7 +162,7 @@ string User::rangeReturnAppointments(string start, string end) {
 	    int startDate = stoi(startDay) + stoi(startMonth) * 100 + stoi(startYear) *10000;
 	    int endDate = stoi(endDay) + stoi(endMonth) * 100 + stoi(endYear) *10000;
 
-	    for(std::pair<string, userAppointment> appointment : this->appointmentTable ){
+	    for(std::pair<string, appointment> appointment : this->appointmentMap ){
 
 	        stringstream date(appointment.second.beginTime);
 

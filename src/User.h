@@ -14,7 +14,7 @@
 using std::string;
 using std::map;
 
-struct userAppointment{
+struct appointment{
 	string beginTime;
 	string endTime;
 	string place;
@@ -32,41 +32,22 @@ private:
 	string phone;
 	string email;
 
-	map<string, userAppointment> appointmentTable;
-
-	const int USERNAME_POS = 0;
-	const int BEGIN_POS = 1;
-	const int END_POS = 2;
-	const int MEMO_POS = 3;
-	const int PLACE_POS = 4;
-
 public:
+
 	User();
 	virtual ~User();
 
-	const string REASON = "reason";
-	const string DATE = "date";
-	const string TIME = "time";
-
-	void populate(string username);
-	bool exists(string username);
-
+	string getAppointment(string beginTime);
+	string getUserAppointments(string username);
+	string getAppointmentRange(string start, string end);
+	map<string, appointment> appointmentMap;
+	void addAppointment(string username, string memo, string beginTime, string endTime, string place);
+	void updateToFile();
+	void deleteUserFile();
+	void getUserFileInfo(string username);
 	void removeAppointment(string username, string beginTime);
-	string sendAllAppointments(string username);
-	string readPassword(string);
-
-	//User
-	const string EMAIL = "email";
-	const string NAME = "name";
-	const string PHONE = "phone";
-
-//	void print();
-	void write();
-	void remove();
-	string readAppointment(string beginTime);
-	int conflictCheck(string beginTime, string username);
-	void createAppointment(string username, string memo, string beginTime, string endTime, string place);
-	string rangeReturnAppointments(string start, string end);
+	bool findUserFile(string username);
+	int findDuplicateUserFiles(string beginTime, string username);
 
 	// Getters
 	const string getUsername() {

@@ -221,7 +221,7 @@ int main(void) {
 					menu.deleteUser(new_fd, recvbuf, user);
 				}
 				else if(!choice.compare("11") || !choice.compare("k")){
-					user.write();
+					user.updateToFile();
 					close(new_fd);
 					_Exit(0);
 				}
@@ -230,6 +230,6 @@ int main(void) {
 		close(new_fd);
 	}
 
-	user.write();
+	user.updateToFile();
 	return 0;
 }
