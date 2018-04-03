@@ -170,12 +170,12 @@ int main(void) {
 					close(new_fd);
 					exit(1);
 				}
-				std::cout <<"[Server]: "<< send_buf << "\n";
+//				std::cout <<"[Server]: "<< send_buf << "\n";
 
 				//Recieve client response
 				numbytes=recv(new_fd, recvbuf, 127, 0);
 				recvbuf[numbytes] = '\0';
-				std::cout << "[Client]: " << recvbuf << "\n";
+//				std::cout << "[Client]: " << recvbuf << "\n";
 
 				std::string choice = recvbuf;
 
