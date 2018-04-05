@@ -26,10 +26,9 @@ using std::string;
 using std::cout;
 using std::endl;
 
-
 #include "MenuOptions.h"
 #include "User.h"
-
+#include "md5.h"
 
 MenuOptions::MenuOptions() {
 }
@@ -54,9 +53,11 @@ bool MenuOptions::login(int new_fd, char *recvbuf, User &user, bool loggedIn) {
 	cout << "Password: " << recvbuf << "\n";
 	password = recvbuf;
 
+	string encryptedPassword = encryptPassword(password);
+
 	if(user.findUserFile(username)){
 		user.getUserFileInfo(username);
-		if (!user.getPassword().compare(password)) {
+		if (!user.getPassword().compare(encryptedPassword)) {
 			send_buf = "Success";
 			send(new_fd, send_buf.c_str(), 127, 0);
 			cout << "Login: " << send_buf << "\n";
@@ -110,7 +111,10 @@ bool MenuOptions::newAccount(int new_fd, char *recvbuf, User &user, bool loggedI
 	recvbuf[bytes] = '\0';
 	cout << "New Account Password: " << recvbuf << "\n";
 	password = recvbuf;
-	user.setPassword(password);
+
+	string encryptedPassword = encryptPassword(password);
+
+	user.setPassword(encryptedPassword);
 
 	bytes = recv(new_fd, recvbuf, 127, 0);
 	recvbuf[bytes] = '\0';
@@ -133,6 +137,12 @@ bool MenuOptions::newAccount(int new_fd, char *recvbuf, User &user, bool loggedI
 	user.updateToFile();
 
 	return loggedIn = true;
+}
+string MenuOptions::encryptPassword(string password) {
+
+	string secretString = "SuperSecretHashingString";
+	string encryptedPassword = md5(password + secretString);
+	return encryptedPassword;
 }
 
 void MenuOptions::addAppointment(int new_fd, char *recvbuf, User &user) {

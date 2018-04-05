@@ -31,6 +31,8 @@ public:
 	void changePhone(int new_fd, char *recvbuf, User &user);
 	void changeEmail(int new_fd, char *recvbuf, User &user);
 	void deleteUser(int new_fd, char *recvbuf, User &user);
+
+	string encryptPassword(string password);
 };
 
 #endif /* MENUOPTIONS_H_ */

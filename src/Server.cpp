@@ -100,10 +100,8 @@ int main(void) {
 		if(!fork()){
 			close(sockfd);
 			recvbuf=(char *) calloc(128, sizeof(char));
-
-
 			bool loggedIn = false;
-			bool validated = false;
+
 			while(!loggedIn){
 
 				string loginScreen = "\n***********************************\n"
@@ -113,8 +111,9 @@ int main(void) {
 						"  >(.)__ <(.)__ =(.)__ \n"
 						"   (___/  (___/  (___/ \n"
 						"\n"
-				        "1) Login\n"
-						"2) Open new account\n"
+				        "1. Login\n"
+						"2. New account\n"
+						"3. Exit\n"
 						"***********************************\n";
 				if(send(new_fd, loginScreen.c_str(), 512, 0) == -1){
 					perror("send");
@@ -126,19 +125,24 @@ int main(void) {
 				//Receive Selection
 				numbytes = recv(new_fd, recvbuf, 127, 0);
 				recvbuf[numbytes] = '\0';
-				string loginChoice = recvbuf;
-				cout << "[Client] " << loginChoice << "\n";
+				string loginSelection = recvbuf;
+				cout << "[Client] " << loginSelection << "\n";
 
 
-				if(!loginChoice.compare("1")){
+				if(!loginSelection.compare("1")){
 					while(!loggedIn) {
 
 						loggedIn = menu.login(new_fd, recvbuf, user, loggedIn);
 					}
 				}
-				else if(!loginChoice.compare("2")){
+				else if(!loginSelection.compare("2")){
 
 					loggedIn = menu.newAccount(new_fd, recvbuf, user, loggedIn);
+				}
+				else if(!loginSelection.compare("3")){
+
+					close(new_fd);
+					_Exit(0);
 				}
 				else{
 					cout << "Invalid Choice"<< endl;
@@ -149,7 +153,7 @@ int main(void) {
 
 				string mainMenu = "\n***********************************\n"
 						"Main Menu:\n"
-				        "1.  Add new appointment\n"
+				        "1.  Add appointment\n"
 				        "2.  Remove appointment\n"
 						"3.  Update existing appointment\n"
 						"4.  Display appointment at a time\n"
@@ -171,50 +175,50 @@ int main(void) {
 				numbytes=recv(new_fd, recvbuf, 127, 0);
 				recvbuf[numbytes] = '\0';
 
-				string choice = recvbuf;
+				string selection = recvbuf;
 
-				if(!choice.compare("1")){
+				if(!selection.compare("1")){
 
 					menu.addAppointment(new_fd, recvbuf, user);
 				}
-				else if(!choice.compare("2")){
+				else if(!selection.compare("2")){
 
 					menu.deleteAppointment(new_fd, recvbuf, user);
 				}
-				else if(!choice.compare("3")){
+				else if(!selection.compare("3")){
 
 					menu.updateAppointment(new_fd, recvbuf, user);
 
 				}
-				else if(!choice.compare("4")){
+				else if(!selection.compare("4")){
 
 					menu.displayAppointTime(new_fd, recvbuf, user);
 				}
-				else if(!choice.compare("5")){
+				else if(!selection.compare("5")){
 
 					menu.displayAppointRange(new_fd, recvbuf, user);
 				}
-				else if(!choice.compare("6")) {
+				else if(!selection.compare("6")) {
 
 					menu.changeName(new_fd, recvbuf, user);
 				}
-				else if(!choice.compare("7")){
+				else if(!selection.compare("7")){
 
 					menu.changePassword(new_fd, recvbuf, user);
 				}
-				else if(!choice.compare("8")){
+				else if(!selection.compare("8")){
 
 					menu.changePhone(new_fd, recvbuf, user);
 				}
-				else if(!choice.compare("9")){
+				else if(!selection.compare("9")){
 
 					menu.changeEmail(new_fd, recvbuf, user);
 				}
-				else if(!choice.compare("10")){
+				else if(!selection.compare("10")){
 
 					menu.deleteUser(new_fd, recvbuf, user);
 				}
-				else if(!choice.compare("11") || !choice.compare("k")){
+				else if(!selection.compare("11") || !selection.compare("k")){
 					user.updateToFile();
 					close(new_fd);
 					_Exit(0);

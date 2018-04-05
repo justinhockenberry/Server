@@ -1,8 +1,0 @@
-justin
-hello
-Justin
-7203143577
-justin@gmail.com
-justin;07:00 05/05/2018;08:00 05/05/2018;run;outside
-justin;15:00 05/07/2018;16:00 05/07/2018;say hi;home
-justin;20:00 05/05/2018;22:00 05/05/2018;RUN;outside
