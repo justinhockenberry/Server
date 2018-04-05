@@ -162,7 +162,7 @@ int main(void) {
 						"7.  Change password\n"
 						"8.  Change phone number\n"
 						"9.  Change email\n"
-						"10. Delete a user\n"
+						"10. Delete user account\n"
 						"11. Exit\n"
 						"***********************************\n";
 
