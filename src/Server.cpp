@@ -27,7 +27,8 @@
 
 #define MYPORT 336958
 #define BACKLOG 10
-
+using std::cout;
+using std::endl;
 
 void sigchld_handler(int s){
 
@@ -105,7 +106,7 @@ int main(void) {
 			bool validated = false;
 			while(!loggedIn){
 
-				std::string login = "\n***********************************\n"
+				string loginScreen = "\n***********************************\n"
 						"Welcome to the Calendar\n"
 						"	Everyone's Quacking about!\n"
 						"    _      _      _    \n"
@@ -115,69 +116,62 @@ int main(void) {
 				        "1) Login\n"
 						"2) Open new account\n"
 						"***********************************\n";
-				if(send(new_fd, login.c_str(), 512, 0) == -1){
+				if(send(new_fd, loginScreen.c_str(), 512, 0) == -1){
 					perror("send");
 					close(new_fd);
 					exit(1);
 				}
-				std::cout <<"[Server]: "<< login << "\n";
+				cout << loginScreen << "\n";
 
 				//Receive Selection
 				numbytes = recv(new_fd, recvbuf, 127, 0);
 				recvbuf[numbytes] = '\0';
-				std::string loginChoice = recvbuf;
-				std::cout << "[Client] " << loginChoice << "\n";
+				string loginChoice = recvbuf;
+				cout << "[Client] " << loginChoice << "\n";
 
 
 				if(!loginChoice.compare("1")){
 					while(!loggedIn) {
 
 						loggedIn = menu.login(new_fd, recvbuf, user, loggedIn);
-
 					}
 				}
 				else if(!loginChoice.compare("2")){
 
 					loggedIn = menu.newAccount(new_fd, recvbuf, user, loggedIn);
-
 				}
 				else{
-					string send_buf = "Invalid Choice";
-					std::cout << "[Server]: " << send_buf << "\n";
+					cout << "Invalid Choice"<< endl;
 				}
 			}
-
 
 			while(true){
 
 				string mainMenu = "\n***********************************\n"
 						"Main Menu:\n"
-				        "1)  Add a new appointment\n"
-				        "2)  Remove an appointment\n"
-						"3)  Update an existing appointment\n"
-						"4)  Display appointment at a time\n"
-						"5)  Display appointments in a time range\n"
-						"6)  Change name\n"
-						"7)  Change password\n"
-						"8)  Change phone number\n"
-						"9)  Change email\n"
-						"10) Delete a user\n"
-						"11) Exit\n"
+				        "1.  Add new appointment\n"
+				        "2.  Remove appointment\n"
+						"3.  Update existing appointment\n"
+						"4.  Display appointment at a time\n"
+						"5.  Display appointments in a time range\n"
+						"6.  Change name\n"
+						"7.  Change password\n"
+						"8.  Change phone number\n"
+						"9.  Change email\n"
+						"10. Delete a user\n"
+						"11. Exit\n"
 						"***********************************\n";
-				string send_buf = mainMenu;
-				if(send(new_fd, send_buf.c_str(), 512, 0) == -1){
+
+				if(send(new_fd, mainMenu.c_str(), 512, 0) == -1){
 					perror("send");
 					close(new_fd);
 					exit(1);
 				}
-//				std::cout <<"[Server]: "<< send_buf << "\n";
 
-				//Recieve client response
 				numbytes=recv(new_fd, recvbuf, 127, 0);
 				recvbuf[numbytes] = '\0';
-//				std::cout << "[Client]: " << recvbuf << "\n";
 
-				std::string choice = recvbuf;
+				string choice = recvbuf;
 
 				if(!choice.compare("1")){
 
