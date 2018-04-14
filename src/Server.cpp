@@ -120,7 +120,6 @@ int main(void) {
 					close(new_fd);
 					exit(1);
 				}
-				cout << loginScreen << "\n";
 
 				//Receive Selection
 				numbytes = recv(new_fd, recvbuf, 127, 0);
@@ -180,6 +179,7 @@ int main(void) {
 				if(!selection.compare("1")){
 
 					menu.addAppointment(new_fd, recvbuf, user);
+
 				}
 				else if(!selection.compare("2")){
 
@@ -188,7 +188,6 @@ int main(void) {
 				else if(!selection.compare("3")){
 
 					menu.updateAppointment(new_fd, recvbuf, user);
-
 				}
 				else if(!selection.compare("4")){
 

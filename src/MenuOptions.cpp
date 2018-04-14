@@ -330,8 +330,13 @@ void MenuOptions::changePassword(int new_fd, char *recvbuf, User &user) {
 
 	bytes=recv(new_fd, recvbuf, 127, 0);
 	recvbuf[bytes] = '\0';
-	user.setPassword(recvbuf);
-	user.deleteUserFile();
+	string password = recvbuf;
+
+	string encryptedPassword = encryptPassword(password);
+
+	user.setPassword(encryptedPassword);
+
+	user.updateToFile();
 	send_buf = "Success";
 	send(new_fd, send_buf.c_str(), 127, 0);
 	cout << "Changed  password to: "<< recvbuf << endl;
